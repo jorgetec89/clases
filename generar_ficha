@@ -1,0 +1,81 @@
+	function GeneraFichaReferenciada($referencia,$alumno,$matricula,$arrayconceptos){
+            global $path,$NODO;
+			if($NODO == 'ecatepec' || $NODO == 'juarez')
+				$numempresa = '95473';
+			else
+				$numempresa = '42946';
+            $fecha = date("Y-m-d");
+            $formato = array(216,140);
+            $oPdf = new FPDF('P','mm',$formato);
+            
+			$oPdf->lineheight=0.5;			
+			$oPdf->SetFont('Arial','',7);
+			$oPdf->SetDisplayMode('real','continuous');
+			$oPdf->SetAutoPageBreak(false);
+			            
+            $oPdf->AddPage(); 
+            $oPdf->SetXY(10, 20);            
+			$oPdf->SetFont('Arial','',11);
+            $oPdf->Cell(100,8,'REFERENCIA: '.$referencia,0);
+			$oPdf->SetFont('Arial','',7);
+            $oPdf->Ln();
+            $oPdf->Cell(100,8,'EMPRESA: '.$numempresa,0);
+            $oPdf->SetXY(100, 20);
+            $oPdf->Cell(150,8,$fecha,0);      
+            //$oPdf->SetXY(50, 30);
+            //$oPdf->Cell(100,8,$alumno,0);
+            $oPdf->SetXY(150, 30);
+            $oPdf->Cell(100,8,$matricula,0);
+            $oPdf->SetXY(10, 120);
+            $oPdf->Cell(100,8,'Conserva tu ficha para cualquier aclaraci�n',0); 
+	   $oPdf->SetFont('Arial','',5);
+            $oPdf->SetXY(10, 125);
+            $oPdf->Cell(100,8,$alumno,0);
+	   $oPdf->SetFont('Arial','',7);
+            $extra = 0;           
+            foreach ($arrayconceptos as $i => $v){
+            	$y = 40 + $i/2 +$extra;            	
+                $oPdf->SetXY(10, $y);
+                $oPdf->MultiCell(140,4,$v[0],0,'R');
+                $oPdf->SetXY(150,$y);
+                $oPdf->Cell(100,4,"$".number_format($v[1],2,".",","),0);
+                $total = $total + $v[1];
+                $contador = $i+10;
+                $extra += 4;
+                //echo $v[0].' :: '.$v[1].'<br>';
+            }
+            //$oPdf->SetXY(100, 40 + $contador/2);
+             $oPdf->Ln();
+            $oPdf->SetX(10);
+	    $oPdf->SetFont('Arial','',9);
+            $oPdf->Cell(140,8,"Total:",0,0,'R');
+            //$oPdf->SetXY(150, 40 + $contador/2);
+            $oPdf->SetX(150);
+            $oPdf->Cell(50,8,"$".number_format($total,2,".",","),0);
+            $oPdf->Output($path.'/caja/archivosvouchers/'.$referencia.'.pdf','F');
+            return $referencia;
+    }    
+
+
+	function GeneraFichaReferenciadaicel($referencia,$nombrealumno,$montoreferencia,$nombrepago){
+		global $path;
+		$oPdf = new FPDF('P','cm');
+		$oPdf->AddPage();
+		$oPdf->SetFont('Arial','',10);
+		$ref = array();
+		for($i= 0 ;$i<strlen($referencia); $i++){
+			$ref[] = $referencia[$i];
+		}
+		$nombrefile = rand(1000,1100);
+		$referenciaprint = implode(" ",$ref);
+		$oPdf->SetXY(1, 5);
+		$oPdf->Cell(10,0.8,$nombrealumno,0);
+		$oPdf->SetFont('Arial','',11);
+		$oPdf->SetXY(1,5.8);
+		$oPdf->Cell(10,0.8,$referenciaprint,0);
+		$oPdf->SetFont('Arial','',10);
+		$oPdf->SetXY(13,5.5);
+		$oPdf->Cell(8,0.8,"$nombrepago $".number_format($montoreferencia,2,".",","),0);
+		$oPdf->Output($path.'/caja/archivosvouchers/'.$referencia.'.pdf','F');
+		return $referencia;
+	}
